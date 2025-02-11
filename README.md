@@ -1,7 +1,7 @@
 # Ferramentas
 
-- Node.js (v14 or higher)
-- PostgreSQL (v12 or higher)
+- Node.js (v14 ou +)
+- PostgreSQL (v12 ou +)
 - npm (Node Package Manager)
 
 # Instalação e Uso
