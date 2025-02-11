@@ -15,7 +15,7 @@
    - database: 'db_ecommerce'
    - port: 5432
 
-4. Clone o repositório: git clone https://github.com/your-username/sistema-ecommerce.git
+4. Clone o repositório: git clone https://github.com/matheusdejesus/sistema-ecommerce.git
 5. instale as dependências: cd sistema-ecommerce
                             npm install
 
