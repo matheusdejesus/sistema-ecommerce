@@ -16,6 +16,6 @@
    - port: 5432
 
 4. Clone o repositório: git clone https://github.com/matheusdejesus/sistema-ecommerce.git
-5. instale as dependências no diretório: npm install
+5. Instale as dependências no diretório: npm install
 
 6. Inicie o servidor: node server.js
