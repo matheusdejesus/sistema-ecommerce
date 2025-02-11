@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="form-container">
+        <h2 class="form-title">CADASTRAR PRODUTO</h2>
+        <div class="form-group">
+            <label class="form-label">CATEGORIA</label>
+            <select class="form-input">
+                <option value="">Selecione uma categoria</option>
+                <option value="eletronicos">Eletrônicos</option>
+                <option value="roupas">Roupas</option>
+                <option value="acessorios">Acessórios</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">TÍTULO</label>
+            <input type="text" class="form-input" placeholder="Digite o Título do Anúncio">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">DESCRIÇÃO</label>
+            <textarea class="form-textarea" placeholder="Digite a descrição do produto"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">FOTOS</label>
+            <div class="photo-upload">
+                SELECIONE ATÉ 6 FOTOS
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">VALOR</label>
+            <input type="text" class="form-input" placeholder="Preço do Produto">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">QUANTIDADE</label>
+            <input type="number" class="form-input" placeholder="Estoque Disponível">
+        </div>
+
+        <button class="save-button">SALVAR</button>
+    </div>
+</body>
+
+</html>

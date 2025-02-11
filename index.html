@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Administrativo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo">
+        <h2 id="logoText" style="cursor: pointer;">E-Commerce Admin</h2>
+      </div>
+      <nav class="menu">
+        <ul>
+          <li><a href="#">Pedidos</a></li>
+          <li><a href="#">Produtos</a></li>
+          <li><a href="cadastrar-produto.html">Adicionar Produtos</a></li>
+          <li><a href="login.html" id="userAccount">Minha Conta</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header>
+        <h1>Bem-vindo ao Painel Administrativo</h1>
+      </header>
+      <section id="content">
+        <p>Selecione uma opção no menu para começar.</p>
+      </section>
+    </main>
+  </div>
+  <script>
+    document.getElementById("logoText").addEventListener("click", function () {
+      document.querySelector(".main-content header h1").textContent = "Bem-vindo ao Painel Administrativo";
+      document.querySelector("#content").innerHTML = "<p>Selecione uma opção no menu para começar.</p>";
+    });
+
+    document.querySelector('a[href="cadastrar-produto.html"]').addEventListener("click", function (e) {
+      e.preventDefault();
+      fetch('cadastrar-produto.html')
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const formContainer = doc.querySelector('.form-container');
+          document.querySelector(".main-content header h1").textContent = "Cadastrar Produto";
+          document.querySelector("#content").innerHTML = '';
+          document.querySelector("#content").appendChild(formContainer);
+        });
+    });
+
+    // Verificar se o usuário está logado e atualizar o menu
+    window.onload = function () {
+      const userLoggedIn = localStorage.getItem('userLoggedIn');
+      const nomeUsuario = localStorage.getItem('nomeUsuario');
+      const userAccountLink = document.getElementById('userAccount');
+
+      if (userLoggedIn === 'true' && nomeUsuario) {
+        userAccountLink.textContent = nomeUsuario;
+      }
+    }
+  </script>
+</body>
+
+</html>

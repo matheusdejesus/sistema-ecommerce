@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - E-Commerce Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo">
+        <h2>
+          <a href="index.html" style="color: inherit; text-decoration: none;">E-Commerce Admin</a>
+        </h2>
+      </div>
+      <nav class="menu">
+        <ul>
+          <li><a href="#">Pedidos</a></li>
+          <li><a href="#">Produtos</a></li>
+          <li><a href="#">Adicionar Produtos</a></li>
+          <li><a href="login.html" class="active">Minha Conta</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="login-main">
+      <div class="login-container">
+        <h1>Login</h1>
+        <form id="loginForm" onsubmit="fazerLogin(event)">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" required />
+          </div>
+          <button type="submit">Entrar</button>
+          <div class="login-footer">
+            <a href="registro_usuarios.html" class="register">Registre-se</a>
+            <a href="esqueceu-senha.html" class="forgot">Esqueceu a senha?</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    async function fazerLogin(event) {
+      event.preventDefault();
+
+      const formData = new FormData(event.target);
+      const dados = {
+        email: formData.get('email'),
+        senha: formData.get('senha')
+      };
+
+      try {
+        console.log('Enviando dados:', dados);
+
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(dados)
+        });
+
+        console.log('Status da resposta:', response.status);
+
+        const result = await response.json();
+        console.log('Resposta do servidor:', result);
+
+        if (result.success) {
+          localStorage.setItem('nomeUsuario', result.nome);
+          localStorage.setItem('userLoggedIn', 'true');
+          window.location.href = 'index.html';
+        } else {
+          alert('Erro no login: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Erro detalhado:', error);
+        alert('Erro ao fazer login. Por favor, verifique suas credenciais.');
+      }
+    }
+  </script>
+</body>
+
+</html>
