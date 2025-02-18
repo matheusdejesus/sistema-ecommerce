@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Produto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Admin</a>
+        </div>
+    </nav>
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">Editar Produto</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Formulário para editar as informações do produto -->
+                        <form id="editProductForm">
+                            <div class="mb-3">
+                                <label for="produtoCategoria" class="form-label">Categoria</label>
+                                <select class="form-control" id="produtoCategoria" name="id_categoria" required>
+                                    <option value="1">Eletrônicos</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="produtoNome" class="form-label">Nome do Produto</label>
+                                <input type="text" class="form-control" id="produtoNome" name="nome" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="produtoDescricao" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="produtoDescricao" name="descricao"
+                                    rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="produtoEstoque" class="form-label">Quantidade em Estoque</label>
+                                <input type="number" class="form-control" id="produtoEstoque" name="quantidade_estoque"
+                                    required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="produtoPreco" class="form-label">Preço</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" id="produtoPreco" name="preco" required
+                                        step="0.01" min="0.01">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="produtoImagens" class="form-label">Novas Imagens (opcional)</label>
+                                <input type="file" class="form-control" id="produtoImagens" name="imagens"
+                                    accept="image/*" multiple>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="window.location.href='meus_produtos.html'">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <span>© 2025 Admin - Versão 1.0</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let productId;
+
+        // Função para carregar os detalhes do produto com base no ID presente na URL
+        async function loadProductDetails() {
+            try {
+                // Obtém os parâmetros da URL e extrai o ID do produto
+                const urlParams = new URLSearchParams(window.location.search);
+                productId = urlParams.get('id');
+
+                // Verifica se o ID foi fornecido; se não, redireciona para a lista de produtos
+                if (!productId) {
+                    alert('ID do produto não fornecido');
+                    window.location.href = 'meus_produtos.html';
+                    return;
+                }
+
+                // Consulta a API para obter os detalhes do produto
+                const response = await fetch(`/api/produtos/${productId}`);
+                const produto = await response.json();
+
+                // Preenche os campos do formulário com os dados retornados da API
+                document.getElementById('produtoCategoria').value = produto.id_categoria;
+                document.getElementById('produtoNome').value = produto.nome;
+                document.getElementById('produtoDescricao').value = produto.descricao;
+                document.getElementById('produtoEstoque').value = produto.quantidade_estoque;
+                document.getElementById('produtoPreco').value = parseFloat(produto.preco).toFixed(2);
+            } catch (error) {
+                // Registra o erro no console e exibe um alerta para o usuário
+                console.error('Erro ao carregar detalhes do produto:', error);
+                alert('Erro ao carregar detalhes do produto');
+            }
+        }
+
+        // Evento de escuta para atualizar o produto ao enviar o formulário
+        document.getElementById('editProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Previne o comportamento padrão do formulário
+
+            // Criação de um objeto FormData para coletar os dados do formulário
+            const formData = new FormData();
+            formData.append('id_categoria', document.getElementById('produtoCategoria').value);
+            formData.append('nome', document.getElementById('produtoNome').value);
+            formData.append('descricao', document.getElementById('produtoDescricao').value);
+            formData.append('quantidade_estoque', document.getElementById('produtoEstoque').value);
+            formData.append('preco', document.getElementById('produtoPreco').value);
+
+            // Adiciona as novas imagens, se existirem
+            const imagens = document.getElementById('produtoImagens').files;
+            Array.from(imagens).forEach(image => {
+                formData.append('imagens', image);
+            });
+
+            try {
+                // Envia uma requisição PUT para atualizar os dados do produto na API
+                const response = await fetch(`/api/produtos/${productId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                // Se a resposta for bem-sucedida, notifica o usuário e redireciona para a página de produtos
+                if (response.ok) {
+                    alert('Produto atualizado com sucesso!');
+                    window.location.href = 'meus_produtos.html';
+                } else {
+                    // Em caso de erro, recupera a mensagem de erro retornada pela API e a lança
+                    const data = await response.json();
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                // Exibe um alerta informando o erro ocorrido na atualização do produto
+                alert('Erro ao atualizar produto: ' + error.message);
+            }
+        });
+
+        // Carrega os detalhes do produto assim que a página for carregada
+        window.addEventListener('load', loadProductDetails);
+    </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- Define a viewport para garantir responsividade em dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha</title>
+    <!-- Importa o CSS do Bootstrap para estilização rápida e responsiva -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilização básica para garantir que o body ocupe a altura total da janela */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container que centraliza o formulário de recuperação de senha */
+        .recover-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        /* Estilização do formulário com largura máxima e sombra para destaque */
+        .recover-form {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Garante que o rodapé fique sempre embaixo da página */
+        .footer {
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar: cabeçalho da página com link para a página inicial -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <!-- Link para a página inicial do Admin -->
+            <a class="navbar-brand" href="index.html">Admin</a>
+        </div>
+    </nav>
+    <!-- Container principal onde o formulário de recuperação de senha será exibido -->
+    <div class="recover-container">
+        <div class="recover-form">
+            <!-- Título centralizado do formulário -->
+            <h2 class="text-center mb-4">Recuperar Senha</h2>
+            <!-- Instruções para o usuário -->
+            <p class="text-center mb-4">Digite seu e-mail para receber as instruções de recuperação de senha.</p>
+            <!-- Formulário de recuperação de senha -->
+            <form id="recoverForm">
+                <!-- Campo de email com label -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <!-- Input do tipo email com validação required -->
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <!-- Botões organizados em layout de grade (d-grid) -->
+                <div class="d-grid gap-2">
+                    <!-- Botão de envio para processar a recuperação de senha -->
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                    <!-- Link para voltar à página de login -->
+                    <a href="login_adm.html" class="btn btn-outline-secondary">Voltar para Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Footer: exibe informações de copyright e versão do sistema -->
+    <footer class="footer mt-auto py-3 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <!-- Informações de copyright -->
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Sistema E-commerce</p>
+                </div>
+                <!-- Exibe a versão do sistema alinhada à direita -->
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">Versão 1.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Importa o JavaScript do Bootstrap para funcionalidades interativas -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Aqui podem ser adicionados scripts JavaScript para tratar o envio do formulário -->
+    <script>
+        // Exemplo: tratamento do envio do formulário
+        document.getElementById('recoverForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita o comportamento padrão do formulário
+            const email = document.getElementById('email').value.trim();
+
+            // Validação simples para garantir que o campo de e-mail não esteja vazio
+            if (!email) {
+                alert('Por favor, insira um email válido.');
+                return;
+            }
+
+            try {
+                // Simula uma requisição para a API para recuperação de senha
+                const response = await fetch('/api/admin/recuperar-senha', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                // Interpreta a resposta da API
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Instruções de recuperação de senha foram enviadas para o seu email.');
+                } else {
+                    alert(`Erro: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Erro ao enviar solicitação:', error);
+                alert('Erro ao enviar solicitação. Tente novamente mais tarde.');
+            }
+        });
+    </script>
+</body>
+
+</html>

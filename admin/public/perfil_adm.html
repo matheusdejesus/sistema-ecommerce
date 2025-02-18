@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - Painel Administrativo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Define a altura mínima e organiza o layout da página em coluna */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Garante que o rodapé fique sempre ao final da página */
+        .footer {
+            margin-top: auto;
+        }
+
+        /* Centraliza e define largura máxima para o container do formulário */
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Centraliza o título do card */
+        .card-header h4 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar: Cabeçalho da página com link para a página inicial -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Admin</a>
+        </div>
+    </nav>
+    <!-- Container principal que engloba o formulário de edição de perfil -->
+    <div class="container mt-4">
+        <div class="form-container">
+            <div class="card">
+                <!-- Cabeçalho do card com o título do formulário -->
+                <div class="card-header">
+                    <h4 class="mb-0">Editar Perfil</h4>
+                </div>
+                <!-- Corpo do card: contém o formulário de edição de perfil -->
+                <div class="card-body">
+                    <form id="editProfileForm">
+                        <!-- Campo para o nome do usuário -->
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" required>
+                        </div>
+                        <!-- Campo para o email do usuário -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <!-- Campo para o CPF ou CNPJ do usuário -->
+                        <div class="mb-3">
+                            <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
+                            <input type="text" class="form-control" id="cpf_cnpj" required>
+                        </div>
+                        <!-- Campo para o CEP -->
+                        <div class="mb-3">
+                            <label for="cep" class="form-label">CEP</label>
+                            <input type="text" class="form-control" id="cep" required>
+                        </div>
+                        <!-- Campo para o endereço do usuário -->
+                        <div class="mb-3">
+                            <label for="endereco" class="form-label">Endereço</label>
+                            <input type="text" class="form-control" id="endereco" required>
+                        </div>
+                        <!-- Campo para a senha atual, necessário para confirmar as alterações -->
+                        <div class="mb-3">
+                            <label for="senha" class="form-label">Senha Atual</label>
+                            <input type="password" class="form-control" id="senha" required>
+                        </div>
+                        <!-- Botões para salvar a atualização ou retornar à página principal -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            <a href="index.html" class="btn btn-secondary">Voltar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer: exibe informações de copyright e versão -->
+    <footer class="footer mt-auto py-3 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Sistema E-commerce</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">Versão 1.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Preenche os campos do formulário com os dados do usuário armazenados no localStorage
+        window.addEventListener('load', () => {
+            // Recupera os dados do usuário salvos no navegador
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            // Se não houver dados, redireciona para a página de login
+            if (!userData) {
+                window.location.href = 'login_adm.html';
+                return;
+            }
+            // Preenche os campos de nome, email, CPF/CNPJ, CEP e endereço se os dados existirem
+            const fields = ['nome', 'email', 'cpf_cnpj', 'cep', 'endereco'];
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                if (element && userData[field]) {
+                    element.value = userData[field];
+                }
+            });
+            // Garante que o campo de senha esteja vazio para que o usuário insira sua senha atual
+            document.getElementById('senha').value = '';
+        });
+
+        // Manipula o envio do formulário para atualizar o perfil do usuário
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Recupera os dados atuais do usuário armazenados no localStorage
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const senha = document.getElementById('senha').value;
+            // Validação básica: senha é obrigatória para confirmar as alterações
+            if (!senha) {
+                alert('Você deve informar sua senha para confirmar as alterações');
+                return;
+            }
+            // Cria o objeto de dados que será enviado para atualização do perfil
+            const formData = {
+                id: userData.id, // Utiliza o ID do usuário para identificar o registro a ser atualizado
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                cpf_cnpj: document.getElementById('cpf_cnpj').value,
+                cep: document.getElementById('cep').value,
+                endereco: document.getElementById('endereco').value,
+                senha: senha // Envia a senha atual para verificação na API
+            };
+            try {
+                // Envia a requisição PUT para a API atualizando o perfil do usuário
+                const response = await fetch('/api/users/update-profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    // Atualiza os dados do usuário armazenados no localStorage com as novas informações retornadas pela API
+                    localStorage.setItem('userData', JSON.stringify({
+                        ...userData,
+                        ...data.user
+                    }));
+                    alert('Perfil atualizado com sucesso!');
+                    // Redireciona para a página inicial do painel
+                    window.location.href = 'index.html';
+                } else {
+                    // Exibe mensagem de erro retornada pela API
+                    alert(`Erro: ${data.message}`);
+                }
+            } catch (error) {
+                // Em caso de falha na requisição, exibe um alerta e loga o erro no console
+                alert('Erro ao atualizar perfil');
+                console.error('Erro:', error);
+            }
+        });
+    </script>
+</body>
+</html>

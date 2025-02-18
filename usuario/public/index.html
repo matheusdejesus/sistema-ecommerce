@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Loja - Página Principal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Estilos para o carousel, cards e layout */
+        .carousel-item img {
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            background-color: #212529;
+            border-radius: 50%;
+            padding: 10px;
+        }
+
+        .carousel-indicators .active {
+            background-color: black;
+            margin-bottom: -100px;
+        }
+
+        h2 {
+            margin-left: 60px;
+            margin-bottom: 5px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        #productsContainer {
+            min-height: 100px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 360px;
+            margin: 10px auto;
+            background-color: #212529;
+            color: #fff;
+            margin-left: 40px;
+        }
+
+        .card-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .card-text {
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .btn-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .mt-auto {
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar com dados de usuário atualizados via JavaScript -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">TechStore</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <form class="d-flex ms-auto my-2 my-lg-0" style="max-width: 300px; width: 100%;" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Buscar produtos"
+                        aria-label="Buscar produtos">
+                    <button class="btn btn-outline-light" type="submit">Buscar</button>
+                </form>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="navbarUser">
+                    <!-- Conteúdo atualizado via JS -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="container-fluid mt-4">
+        <h2>Últimos Produtos</h2>
+        <div id="productsContainer" class="row"></div>
+    </main>
+    <footer class="footer mt-auto py-3 bg-dark text-white">
+        <div class="container text-center">
+            <span>© 2025 TechStore</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Carrega e renderiza os produtos
+        let products = [];
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/produtos');
+                if (!response.ok) throw new Error('Erro ao buscar produtos');
+                products = await response.json();
+                const container = document.getElementById('productsContainer');
+                if (products.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center"><p class="mt-4">Nenhum produto disponível.</p></div>';
+                    return;
+                }
+                container.innerHTML = products.map(prod => `
+              <div class="col-md-4 mb-4">
+                  <div class="card h-100 shadow-sm">
+                      ${prod.url_imagem ?
+                        `<div id="carousel-${prod.id_produto}" class="carousel slide" data-bs-ride="false">
+                              <div class="carousel-inner">
+                                  ${prod.url_imagem.split(',').map((img, index) => `
+                                      <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                          <img src="/uploads/${img.trim()}" 
+                                               class="card-img-top d-block" 
+                                               style="height: 210px; object-fit: cover; width: 100%; margin: 0 auto;"
+                                               alt="${prod.nome}">
+                                      </div>
+                                  `).join('')}
+                              </div>
+                              ${prod.url_imagem.split(',').length > 1 ? `
+                                  <button class="carousel-control-prev" type="button" data-bs-target="#carousel-${prod.id_produto}" data-bs-slide="prev">
+                                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                      <span class="visually-hidden">Anterior</span>
+                                  </button>
+                                  <button class="carousel-control-next" type="button" data-bs-target="#carousel-${prod.id_produto}" data-bs-slide="next">
+                                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                      <span class="visually-hidden">Próximo</span>
+                                  </button>
+                              ` : ''}
+                          </div>` : '<div class="text-center p-3">Sem imagem</div>'}
+                      <div class="card-body">
+                          <div class="product-info">
+                              <h5 class="card-title">${prod.nome}</h5>
+                              <p class="card-text">${prod.descricao ? prod.descricao : 'Sem descrição'}</p>
+                              <p class="card-text"><strong>Categoria:</strong> ${prod.categoria_nome || 'N/D'}</p>
+                          </div>
+                          <div class="price-info mt-auto">
+                              <h4 class="text-primary mb-0">R$ ${parseFloat(prod.preco).toFixed(2)}</h4>
+                              ${prod.quantidade_estoque > 0 ?
+                        `<small class="text-success">Em estoque: ${prod.quantidade_estoque}</small>` :
+                        '<small class="text-danger">Fora de estoque</small>'}
+                              <div class="btn-container">
+                                  <button class="btn btn-primary w-75" onclick="addToCart(${prod.id_produto})">
+                                      Adicionar ao Carrinho
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          `).join('');
+                // Inicia o carousel para produtos com múltiplas imagens
+                products.forEach(prod => {
+                    if (prod.url_imagem && prod.url_imagem.split(',').length > 1) {
+                        new bootstrap.Carousel(document.getElementById(`carousel-${prod.id_produto}`), { interval: false });
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                const container = document.getElementById('productsContainer');
+                container.innerHTML = '<div class="col-12 text-center"><p class="mt-4 text-danger">Erro ao carregar produtos.</p></div>';
+            }
+        }
+        // Adiciona produto ao carrinho
+        function addToCart(productId) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const adminData = JSON.parse(localStorage.getItem('adminData'));
+            if (adminData || !userData || !userData.id) {
+                alert("Faça login com uma conta de cliente para adicionar produtos ao carrinho.");
+                return;
+            }
+            const produto = products.find(p => p.id_produto === productId);
+            if (!produto) return;
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const index = cartItems.findIndex(item => item.id_produto === produto.id_produto);
+            if (index !== -1) {
+                cartItems[index].quantidade = (cartItems[index].quantidade || 1) + 1;
+            } else {
+                produto.quantidade = 1;
+                cartItems.push(produto);
+            }
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            alert('Produto adicionado ao carrinho!');
+        }
+        // Redireciona para login se o usuário não estiver logado
+        function redirectIfNotLoggedIn(event) {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData || !userData.id) {
+                event.preventDefault();
+                alert("Faça login para acessar o carrinho.");
+            }
+        }
+        function checkLoginAndRedirect(event) {
+            event.preventDefault();
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData || !userData.id) {
+                alert("Faça login para acessar sua conta.");
+                window.location.href = "login_usuario.html";
+            } else {
+                window.location.href = "perfil_usuario.html";
+            }
+        }
+        window.addEventListener('load', loadProducts);
+    </script>
+    <script>
+        // Atualiza o Navbar com dados de usuário se logado
+        window.addEventListener('load', () => {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const navbarUser = document.getElementById('navbarUser');
+            if (userData && userData.id && userData.tipo === 'cliente') {
+                navbarUser.innerHTML = `
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            ${userData.nome}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="perfil_usuario.html">Editar Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" onclick="logoutUser()">Sair</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="carrinho_compras.html">
+                            <i class="bi bi-cart"></i>
+                        </a>
+                    </li>
+                `;
+            } else {
+                navbarUser.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="login_usuario.html">Minha Conta</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login_usuario.html">
+                            <i class="bi bi-cart"></i>
+                        </a>
+                    </li>
+                `;
+            }
+        });
+        // Realiza logout removendo os dados do usuário do localStorage
+        function logoutUser() {
+            localStorage.removeItem('userData');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Cliente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-form {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">TechStore</a>
+        </div>
+    </nav>
+    <!-- Formulário de Login para Cliente -->
+    <div class="login-container">
+        <div class="login-form">
+            <h2 class="text-center mb-4">Login - Cliente</h2>
+            <form id="loginClienteForm">
+                <div class="mb-3">
+                    <label for="clienteEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="clienteEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label for="clienteSenha" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="clienteSenha" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="registro_usuario.html" class="text-decoration-none">Registre-se</a>
+                    <a href="esqueceu_senha.html" class="text-decoration-none">Esqueceu a senha?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 TechStore - Versão 1.0</p>
+        </div>
+    </footer>
+    <script>
+        // Submete os dados de login e armazena usuário cliente no localStorage
+        document.getElementById('loginClienteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('clienteEmail').value.trim();
+            const senha = document.getElementById('clienteSenha').value;
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    const clientUser = {
+                        ...data.user,
+                        tipo: 'cliente'
+                    };
+                    localStorage.setItem('userData', JSON.stringify(clientUser));
+                    localStorage.removeItem('adminData');
+                    alert('Login realizado com sucesso!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert(`Erro: ${data.message}`);
+                }
+            } catch (error) {
+                alert('Erro ao realizar login');
+                console.error('Erro:', error);
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
