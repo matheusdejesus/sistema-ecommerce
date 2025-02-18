@@ -1,21 +1,38 @@
-# Ferramentas
+# Pré-requisitos
 
 - Node.js (v14 ou +)
-- PostgreSQL (v12 ou +)
+- MySQL
 - npm (Node Package Manager)
 
 # Instalação e Uso
 
-1. Instale o PostgreSQL
-2. Crie o banco de dados 'db_ecommerce'
-3. Configurar a conexão do banco de dados em database.js:
-   - user: 'postgres'
-   - host: 'localhost'
-   - password: 'sua_senha'
-   - database: 'db_ecommerce'
-   - port: 5432
+<h3>1. Clonar o Repositório:</h3> 
+git clone https://github.com/matheusdejesus/sistema-ecommerce.git
 
-4. Clone o repositório: git clone https://github.com/matheusdejesus/sistema-ecommerce.git
-5. Instale as dependências no diretório: npm install
+ <h3>2. Configurar o Banco de Dados</h3>
+   
+   Crie um banco de dados chamado db_ecommerce no MySQL.
 
-6. Inicie o servidor: npm start
+   Importe o script SQL localizado em db_ecommerce.sql para criar as tabelas necessárias.
+     <h3>3. Configurar as Variáveis de Ambiente</h3>
+
+     Ajuste o arquivo .env com as seguintes configurações:
+
+     DB_HOST=localhost
+
+     DB_USER=root
+
+     DB_PASSWORD='matheus10$'
+
+     DB_NAME=db_ecommerce
+
+     PORT=3000
+
+     STRIPE_SECRET_KEY=sk_test_...
+
+     STRIPE_PUBLIC_KEY=pk_test_...
+
+   <h3>4. Instalar as Dependências:</h3>
+   npm install
+   <h3>5. Executar o Projeto:</h3>
+   npm start
