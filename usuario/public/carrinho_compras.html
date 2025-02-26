@@ -28,7 +28,6 @@
             margin-left: 5px;
         }
     </style>
-    <!-- Inclui Stripe.js -->
     <script src="https://js.stripe.com/v3/"></script>
 </head>
 
@@ -113,10 +112,37 @@
             }
         }
         function removeCartItem(productId) {
-            let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-            cartItems = cartItems.filter(item => item.id_produto !== productId);
-            localStorage.setItem('cartItems', JSON.stringify(cartItems));
-            renderCartItems();
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData || !userData.id) {
+                alert("Faça login para remover produtos do carrinho.");
+                return;
+            }
+            
+            fetch('/api/cart/remove', { // Requisição para remover o produto do carrinho
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_usuario: userData.id,
+                    id_produto: productId
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.message) {
+                        // Atualiza o carrinho local após a remoção do banco
+                        let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+                        cartItems = cartItems.filter(item => item.id_produto !== productId);
+                        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                        renderCartItems();
+                        alert(result.message);
+                    } else {
+                        alert("Erro ao remover produto do carrinho");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Erro ao remover produto do carrinho");
+                });
         }
         // Formata os itens para o Stripe
         function getStripeItems() {
@@ -149,18 +175,23 @@
                     alert("Carrinho vazio!");
                     return;
                 }
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                if (!userData || !userData.id) {
+                    alert("Faça login para concluir a compra.");
+                    return;
+                }
                 const button = document.getElementById('finalizarCheckoutButton');
                 button.disabled = true;
                 button.textContent = 'Processando...';
                 const response = await fetch('/api/checkout/create-checkout-session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ items: cartItems })
+                    body: JSON.stringify({ items: cartItems, userId: userData.id })
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Erro ao processar pagamento');
-                const stripe = Stripe('pk_test_51QtffqQxFGm2W9oFfxCPX5BtVcZvTrkp1cl6IiktQSwAh4hV6RyrEztyF7uG7WopfCwARvPe1sdlh8NaP4RFiXxA00Ku932JF3');
-                const result = await stripe.redirectToCheckout({ sessionId: data.id });
+                const stripeInstance = Stripe('pk_test_51QtffqQxFGm2W9oFfxCPX5BtVcZvTrkp1cl6IiktQSwAh4hV6RyrEztyF7uG7WopfCwARvPe1sdlh8NaP4RFiXxA00Ku932JF3');
+                const result = await stripeInstance.redirectToCheckout({ sessionId: data.id });
                 if (result.error) throw new Error(result.error.message);
             } catch (error) {
                 console.error('Erro:', error);
@@ -173,5 +204,4 @@
         window.addEventListener('load', renderCartItems);
     </script>
 </body>
-
 </html>

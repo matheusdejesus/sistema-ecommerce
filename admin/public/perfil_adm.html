@@ -7,25 +7,21 @@
     <title>Editar Perfil - Painel Administrativo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Define a altura mínima e organiza o layout da página em coluna */
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Garante que o rodapé fique sempre ao final da página */
         .footer {
             margin-top: auto;
         }
 
-        /* Centraliza e define largura máxima para o container do formulário */
         .form-container {
             max-width: 500px;
             margin: 0 auto;
         }
 
-        /* Centraliza o título do card */
         .card-header h4 {
             text-align: center;
         }
@@ -33,54 +29,43 @@
 </head>
 
 <body>
-    <!-- Navbar: Cabeçalho da página com link para a página inicial -->
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.html">Admin</a>
         </div>
     </nav>
-    <!-- Container principal que engloba o formulário de edição de perfil -->
     <div class="container mt-4">
         <div class="form-container">
             <div class="card">
-                <!-- Cabeçalho do card com o título do formulário -->
                 <div class="card-header">
                     <h4 class="mb-0">Editar Perfil</h4>
                 </div>
-                <!-- Corpo do card: contém o formulário de edição de perfil -->
                 <div class="card-body">
                     <form id="editProfileForm">
-                        <!-- Campo para o nome do usuário -->
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome</label>
                             <input type="text" class="form-control" id="nome" required>
                         </div>
-                        <!-- Campo para o email do usuário -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" required>
                         </div>
-                        <!-- Campo para o CPF ou CNPJ do usuário -->
                         <div class="mb-3">
                             <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
                             <input type="text" class="form-control" id="cpf_cnpj" required>
                         </div>
-                        <!-- Campo para o CEP -->
                         <div class="mb-3">
                             <label for="cep" class="form-label">CEP</label>
                             <input type="text" class="form-control" id="cep" required>
                         </div>
-                        <!-- Campo para o endereço do usuário -->
                         <div class="mb-3">
                             <label for="endereco" class="form-label">Endereço</label>
                             <input type="text" class="form-control" id="endereco" required>
                         </div>
-                        <!-- Campo para a senha atual, necessário para confirmar as alterações -->
                         <div class="mb-3">
                             <label for="senha" class="form-label">Senha Atual</label>
                             <input type="password" class="form-control" id="senha" required>
                         </div>
-                        <!-- Botões para salvar a atualização ou retornar à página principal -->
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                             <a href="index.html" class="btn btn-secondary">Voltar</a>
@@ -90,7 +75,6 @@
             </div>
         </div>
     </div>
-    <!-- Footer: exibe informações de copyright e versão -->
     <footer class="footer mt-auto py-3 bg-dark text-white">
         <div class="container">
             <div class="row">
@@ -170,7 +154,6 @@
                     alert(`Erro: ${data.message}`);
                 }
             } catch (error) {
-                // Em caso de falha na requisição, exibe um alerta e loga o erro no console
                 alert('Erro ao atualizar perfil');
                 console.error('Erro:', error);
             }

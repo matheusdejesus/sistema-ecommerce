@@ -104,6 +104,7 @@
                 document.getElementById('produtoEstoque').value = produto.quantidade_estoque;
                 document.getElementById('produtoPreco').value = parseFloat(produto.preco).toFixed(2);
             } catch (error) {
+                
                 // Registra o erro no console e exibe um alerta para o usuário
                 console.error('Erro ao carregar detalhes do produto:', error);
                 alert('Erro ao carregar detalhes do produto');

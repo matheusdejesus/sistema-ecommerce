@@ -3,12 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja - Página Principal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Estilos para o carousel, cards e layout */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+
         .carousel-item img {
             padding: 10px;
             border-radius: 20px;
@@ -84,7 +93,6 @@
 </head>
 
 <body>
-    <!-- Navbar com dados de usuário atualizados via JavaScript -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">TechStore</a>
@@ -98,7 +106,6 @@
                     <button class="btn btn-outline-light" type="submit">Buscar</button>
                 </form>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="navbarUser">
-                    <!-- Conteúdo atualizado via JS -->
                 </ul>
             </div>
         </div>
@@ -193,18 +200,54 @@
                 alert("Faça login com uma conta de cliente para adicionar produtos ao carrinho.");
                 return;
             }
-            const produto = products.find(p => p.id_produto === productId);
-            if (!produto) return;
-            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-            const index = cartItems.findIndex(item => item.id_produto === produto.id_produto);
-            if (index !== -1) {
-                cartItems[index].quantidade = (cartItems[index].quantidade || 1) + 1;
-            } else {
-                produto.quantidade = 1;
-                cartItems.push(produto);
+
+            // Encontra o produto nos produtos carregados
+            const product = products.find(p => p.id_produto === productId);
+            if (!product) {
+                alert("Produto não encontrado");
+                return;
             }
-            localStorage.setItem('cartItems', JSON.stringify(cartItems));
-            alert('Produto adicionado ao carrinho!');
+
+            const data = {
+                id_usuario: userData.id,
+                id_produto: productId
+            };
+
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.message) {
+                        // Atualiza o carrinho no localStorage
+                        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+                        const existingItem = cartItems.find(item => item.id_produto === productId);
+
+                        if (existingItem) {
+                            existingItem.quantidade += 1;
+                        } else {
+                            cartItems.push({
+                                id_produto: product.id_produto,
+                                nome: product.nome,
+                                descricao: product.descricao,
+                                preco: parseFloat(product.preco),
+                                url_imagem: product.url_imagem,
+                                quantidade: 1
+                            });
+                        }
+
+                        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                        alert("Produto adicionado ao carrinho!");
+                    } else {
+                        alert("Erro ao adicionar produto ao carrinho");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Erro ao adicionar produto ao carrinho");
+                });
         }
         // Redireciona para login se o usuário não estiver logado
         function redirectIfNotLoggedIn(event) {
@@ -233,33 +276,35 @@
             const navbarUser = document.getElementById('navbarUser');
             if (userData && userData.id && userData.tipo === 'cliente') {
                 navbarUser.innerHTML = `
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            ${userData.nome}
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="perfil_usuario.html">Editar Perfil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" onclick="logoutUser()">Sair</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="carrinho_compras.html">
-                            <i class="bi bi-cart"></i>
-                        </a>
-                    </li>
-                `;
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        ${userData.nome}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="perfil_usuario.html">Editar Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="usuario_pedidos.html">Meus Pedidos</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logoutUser()">Sair</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="carrinho_compras.html">
+                        <i class="bi bi-cart"></i>
+                    </a>
+                </li>
+            `;
             } else {
                 navbarUser.innerHTML = `
-                    <li class="nav-item">
-                        <a class="nav-link" href="login_usuario.html">Minha Conta</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="login_usuario.html">
-                            <i class="bi bi-cart"></i>
-                        </a>
-                    </li>
-                `;
+                <li class="nav-item">
+                    <a class="nav-link" href="login_usuario.html">Minha Conta</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="login_usuario.html">
+                        <i class="bi bi-cart"></i>
+                    </a>
+                </li>
+            `;
             }
         });
         // Realiza logout removendo os dados do usuário do localStorage
@@ -269,5 +314,4 @@
         }
     </script>
 </body>
-
 </html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore - Meus Pedidos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        .footer {
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">TechStore</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="perfil_usuario.html">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="carrinho_compras.html">
+                            <i class="bi bi-cart"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="content-wrapper">
+        <div class="container mt-4">
+            <h1>Meus Pedidos</h1>
+            <div id="ordersContainer" class="mt-4">
+            </div>
+        </div>
+    </div>
+    <footer class="footer bg-dark text-white py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 TechStore</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">Versão 1.0</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData || !userData.id) {
+                alert("Por favor, faça login para visualizar seus pedidos.");
+                window.location.href = "login_usuario.html";
+                return;
+            }
+
+            const ordersContainer = document.getElementById('ordersContainer');
+
+            async function cancelOrder(orderId) {
+                if (!confirm('Tem certeza que deseja cancelar este pedido?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/orders/${orderId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId: userData.id })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Erro ao cancelar pedido');
+                    }
+
+                    alert('Pedido cancelado com sucesso!');
+                    loadOrders(); // Recarrega a lista de pedidos
+                } catch (error) {
+                    alert('Erro ao cancelar pedido: ' + error.message);
+                }
+            }
+
+            async function loadOrders() {
+                try {
+                    const response = await fetch(`/api/orders?userId=${userData.id}`);
+                    if (!response.ok) throw new Error("Você ainda não realizou nenhum pedido.");
+
+                    const orders = await response.json();
+
+                    if (orders.length === 0) {
+                        ordersContainer.innerHTML = '<p>Você ainda não realizou nenhum pedido.</p>';
+                        return;
+                    }
+
+                    let ordersHTML = '<div class="accordion" id="accordionOrders">';
+                    orders.forEach((order, index) => {
+                        ordersHTML += `
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading${index}">
+                                    <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" 
+                                            data-bs-toggle="collapse" data-bs-target="#collapse${index}" 
+                                            aria-expanded="${index === 0 ? 'true' : 'false'}" 
+                                            aria-controls="collapse${index}">
+                                        Pedido #${order.id} - ${order.date}
+                                    </button>
+                                </h2>
+                                <div id="collapse${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
+                                     aria-labelledby="heading${index}" data-bs-parent="#accordionOrders">
+                                    <div class="accordion-body">
+                                        <ul class="list-group">
+                                            ${order.items.map(item => `
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    ${item.productName}
+                                                    <span>Qtd: ${item.quantity} - R$ ${parseFloat(item.price).toFixed(2)}</span>
+                                                </li>
+                                            `).join('')}
+                                        </ul>
+                                        <p class="mt-2"><strong>Total:</strong> R$ ${parseFloat(order.total).toFixed(2)}</p>
+                                        <div class="d-flex justify-content-end mt-3">
+                                            <button class="btn btn-danger" onclick="cancelOrder(${order.id})">
+                                                Cancelar Pedido
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    ordersHTML += '</div>';
+                    ordersContainer.innerHTML = ordersHTML;
+
+                    window.cancelOrder = cancelOrder;
+                } catch (error) {
+                    ordersContainer.innerHTML = `<div class="alert alert-danger" role="alert">${error.message}</div>`;
+                }
+            }
+            loadOrders();
+        });
+    </script>
+</body>
+
+</html>

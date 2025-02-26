@@ -27,35 +27,6 @@ exports.addProduct = async (req, res) => {
     }
 };
 
-// Controller para listar produtos, opcionalmente filtrando por id_usuario
-exports.getProducts = async (req, res) => {
-    try {
-        const userId = req.query.userId;
-        let query, params;
-        if (!userId) {
-            query = `
-                SELECT p.*, c.nome as categoria_nome 
-                FROM produtos p 
-                LEFT JOIN categorias c ON p.id_categoria = c.id_categoria
-            `;
-            params = [];
-        } else {
-            query = `
-                SELECT p.*, c.nome as categoria_nome 
-                FROM produtos p 
-                LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
-                WHERE p.id_usuario = ?
-            `;
-            params = [userId];
-        }
-        const [products] = await pool.execute(query, params);
-        res.status(200).json(products);
-    } catch (err) {
-        console.error("Erro ao listar produtos:", err);
-        res.status(500).json({ message: "Erro ao listar produtos", error: err.message });
-    }
-};
-
 // Controller para remover um produto
 exports.deleteProduct = async (req, res) => {
     try {
@@ -66,18 +37,6 @@ exports.deleteProduct = async (req, res) => {
     } catch (err) {
         console.error("Erro ao remover produto:", err);
         res.status(500).json({ message: "Erro ao remover produto", error: err.message });
-    }
-};
-
-// Controller para buscar detalhes de um produto específico
-exports.getProduct = async (req, res) => {
-    try {
-        const [product] = await pool.execute('SELECT * FROM produtos WHERE id_produto = ?', [req.params.id]);
-        if (product.length === 0) return res.status(404).json({ message: "Produto não encontrado" });
-        res.json(product[0]);
-    } catch (err) {
-        console.error("Erro ao buscar produto:", err);
-        res.status(500).json({ message: "Erro ao buscar produto", error: err.message });
     }
 };
 
@@ -109,5 +68,20 @@ exports.updateProduct = async (req, res) => {
     } catch (err) {
         console.error("Erro ao atualizar produto:", err);
         res.status(500).json({ message: "Erro ao atualizar produto", error: err.message });
+    }
+};
+
+// Controller para buscar todos os produtos
+exports.getAllProducts = async (req, res) => {
+    try {
+        const [products] = await pool.execute(`
+            SELECT p.*, c.nome as categoria_nome 
+            FROM produtos p 
+            LEFT JOIN categorias c ON p.id_categoria = c.id_categoria
+        `);
+        res.json(products);
+    } catch (err) {
+        console.error("Erro ao buscar produtos:", err);
+        res.status(500).json({ message: "Erro ao buscar produtos" });
     }
 };
