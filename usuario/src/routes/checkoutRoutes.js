@@ -8,16 +8,22 @@ router.post('/create-checkout-session', async (req, res) => {
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ error: "Itens inválidos" });
         }
-        // Cria a sessão de checkout com metadata que inclui o userId
+
+        // Cria um novo array sem o campo id_produto, pois o Stripe não o aceita
+        const sanitizedItems = items.map(item => ({
+            price_data: item.price_data,
+            quantity: item.quantity
+        }));
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
-            line_items: items,
+            line_items: sanitizedItems,
             success_url: `${process.env.BASE_URL}/usuario/pconcluido.html?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.BASE_URL}/usuario/pcancelado.html`,
             metadata: {
                 userId: userId.toString(),
-                items: JSON.stringify(items)
+                items: JSON.stringify(items) // mantém os dados completos, inclusive id_produto, para registrar o pedido posteriormente
             }
         });
         return res.status(200).json({ id: session.id });

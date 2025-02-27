@@ -33,7 +33,7 @@ router.get('/create', async (req, res) => {
                 await connection.execute(
                     `INSERT INTO itens_pedido (id_pedido, id_produto, quantidade, preco) 
                      VALUES (?, ?, ?, ?)`,
-                    [orderId, item.id_produto, item.quantity, item.unit_amount / 100]
+                    [orderId, item.id_produto, item.quantity, item.price_data.unit_amount / 100]
                 );
             }
 
