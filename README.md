@@ -18,11 +18,17 @@
 # Funcionalidades
 
 ✅ Cadastro de Usuários
+
 ✅ Login de Usuários
+
 ✅ Cadastro de Produtos pelo Admin
+
 ✅ Inserção dos Produtos no Carrinho de Compras
+
 ✅ Fazer Pedidos
+
 ✅ Realizar Pagamentos
+
 ✅ Banco de Dados MySQL
 
 
