@@ -14,3 +14,17 @@
 6. Inicie o servidor: npm start
 7. Página do Admin: http://localhost:3000/admin/
 8. Página do usuário: http://localhost:3000/usuario/
+
+# Funcionalidades
+
+✅ Cadastro de Usuários
+✅ Login de Usuários
+✅ Cadastro de Produtos pelo Admin
+✅ Inserção dos Produtos no Carrinho de Compras
+✅ Fazer Pedidos
+✅ Realizar Pagamentos
+✅ Banco de Dados MySQL
+
+
+
+
